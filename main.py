@@ -48,8 +48,8 @@ def main(page: ft.Page):
     page.add(
         ft.Stack(
             [cube],
-            width=WIDTH,
-            height=HEIGHT,
+#            width=WIDTH,
+#            height=HEIGHT,
         )
     )
 
