@@ -1,9 +1,7 @@
 import flet as ft
-import random
-import asyncio
 
 def main(page: ft.Page):
-    page.title = "Анимация котика"
+    page.title = "Котик без анимации"
     
     # Размеры экрана
     WIDTH = page.width
@@ -68,7 +66,7 @@ def main(page: ft.Page):
         top=HEIGHT // 2 - 110 + 3,
     )
 
-    # Уши котика (созданы через два контейнера с "поворотом")
+    # Уши котика
     left_ear = ft.Container(
         width=40,
         height=40,
@@ -99,46 +97,6 @@ def main(page: ft.Page):
         top=HEIGHT // 2 - 10,
     )
 
-    async def move():
-        """Функция для движения котика"""
-        while True:
-            # Случайное смещение
-            move_direction = random.choice([-30, 30])  # Смещение влево или вправо
-            move_up = random.randint(10, 50)  # Случайное "прыжковое" движение вверх
-
-            # Двигаем вверх
-            for i in range(move_up // 10):
-                body.top -= 10
-                head.top -= 10
-                left_eye.top -= 10
-                right_eye.top -= 10
-                left_pupil.top -= 10
-                right_pupil.top -= 10
-                left_ear.top -= 10
-                right_ear.top -= 10
-                tail.top -= 10
-                page.update()
-                await asyncio.sleep(0.05)
-
-            # Падаем обратно вниз
-            for i in range(move_up // 10):
-                body.top += 10
-                head.top += 10
-                left_eye.top += 10
-                right_eye.top += 10
-                left_pupil.top += 10
-                right_pupil.top += 10
-                left_ear.top += 10
-                right_ear.top += 10
-                tail.top += 10
-                page.update()
-                await asyncio.sleep(0.05)
-
-            # Не даем котику выйти за пределы экрана
-            body.top = max(0, min(HEIGHT - 80, body.top))
-            head.top = body.top - 60
-            page.update()
-
     # Добавляем котика на страницу
     page.add(
         ft.Stack(
@@ -147,8 +105,5 @@ def main(page: ft.Page):
             height=HEIGHT,
         )
     )
-
-    # Запускаем анимацию
-    page.run_task(move)
 
 ft.app(target=main)
