@@ -1,7 +1,7 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "Котик через Canvas"
+    page.title = "Котик"
 
     # Создаем холст
     canvas = ft.Canvas(width=400, height=400)
