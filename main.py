@@ -1,53 +1,48 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "Кот с использованием Shape"
-    page.bgcolor = "#f0f0f0"
+    canvas_html = """
+    <html>
+    <body>
+    <canvas id="myCanvas" width="200" height="200"></canvas>
+    <script>
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
 
-    cat = ft.Canvas(
-        [
-            # Тело
-            ft.Fill(
-                ft.Circle(100, 200, 50),
-                ft.Paint(color="gray"),
-            ),
-            # Голова
-            ft.Fill(
-                ft.Circle(100, 130, 40),
-                ft.Paint(color="gray"),
-            ),
-            # Глаза
-            ft.Fill(
-                ft.Circle(85, 120, 10),
-                ft.Paint(color="white"),
-            ),
-            ft.Fill(
-                ft.Circle(115, 120, 10),
-                ft.Paint(color="white"),
-            ),
-            # Зрачки
-            ft.Fill(
-                ft.Circle(85, 120, 5),
-                ft.Paint(color="black"),
-            ),
-            ft.Fill(
-                ft.Circle(115, 120, 5),
-                ft.Paint(color="black"),
-            ),
-            # Уши
-            ft.Fill(
-                ft.Polygon([(60, 90), (80, 40), (100, 90)]),
-                ft.Paint(color="gray"),
-            ),
-            ft.Fill(
-                ft.Polygon([(140, 90), (120, 40), (100, 90)]),
-                ft.Paint(color="gray"),
-            ),
-        ],
-        width=200,
-        height=250,
-    )
+        // Тело кота
+        ctx.fillStyle = "gray";
+        ctx.beginPath();
+        ctx.arc(100, 150, 50, 0, 2 * Math.PI);
+        ctx.fill();
 
-    page.add(cat)
+        // Голова кота
+        ctx.beginPath();
+        ctx.arc(100, 80, 40, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Глаза
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(85, 70, 10, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(115, 70, 10, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.arc(85, 70, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(115, 70, 5, 0, 2 * Math.PI);
+        ctx.fill();
+    </script>
+    </body>
+    </html>
+    """
+
+    webview = ft.WebView(content=canvas_html, width=200, height=200)
+
+    page.add(webview)
 
 ft.app(target=main)
