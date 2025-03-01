@@ -1,16 +1,17 @@
-import tkinter as tk
+import flet as ft
 
-def on_button_click():
-    print("Кнопка нажата!")
+def main(page: ft.Page):
+    page.title = "Простое приложение на Flet"
+    page.add(
+        ft.Text("Привет, мир!", size=30),
+        ft.ElevatedButton("Нажми меня", on_click=lambda e: print("Кнопка нажата!"))
+    )
+    page.bottom_bar = ft.BottomAppBar(
+        ft.Row([
+            ft.IconButton(icon=ft.icons.HOME, on_click=lambda e: print("Домой")),
+            ft.IconButton(icon=ft.icons.SEARCH, on_click=lambda e: print("Поиск")),
+            ft.IconButton(icon=ft.icons.SETTINGS, on_click=lambda e: print("Настройки")),
+        ])
+    )
 
-root = tk.Tk()
-root.title("Простое приложение на Tkinter")
-root.geometry("300x200")
-
-label = tk.Label(root, text="Привет, мир!", font=("Arial", 14))
-label.pack(pady=20)
-
-button = tk.Button(root, text="Нажми меня", command=on_button_click)
-button.pack()
-
-root.mainloop()
+ft.app(target=main)
