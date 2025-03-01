@@ -68,15 +68,15 @@ def main(page: ft.Page):
         top=HEIGHT // 2 - 110 + 3,
     )
 
-    # Уши котика
+    # Уши котика (созданы через два контейнера с "поворотом")
     left_ear = ft.Container(
         width=40,
         height=40,
         bgcolor="gray",
         border_radius=20,
-        left=WIDTH // 2 - 30,
+        left=WIDTH // 2 - 40,
         top=HEIGHT // 2 - 140,
-        transform=ft.Transform(rotation=ft.Rotation(angle=45)),
+        transform=ft.Transform(rotation=ft.Rotation(angle=-45))
     )
 
     right_ear = ft.Container(
@@ -84,9 +84,9 @@ def main(page: ft.Page):
         height=40,
         bgcolor="gray",
         border_radius=20,
-        left=WIDTH // 2 - 30,
+        left=WIDTH // 2 + 10,
         top=HEIGHT // 2 - 140,
-        transform=ft.Transform(rotation=ft.Rotation(angle=-45)),
+        transform=ft.Transform(rotation=ft.Rotation(angle=45))
     )
 
     # Хвост котика
