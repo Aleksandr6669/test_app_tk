@@ -69,14 +69,24 @@ def main(page: ft.Page):
     )
 
     # Уши котика
-    left_ear = ft.Polygon(
-        points=[(WIDTH // 2 - 30, HEIGHT // 2 - 130), (WIDTH // 2 - 45, HEIGHT // 2 - 155), (WIDTH // 2 - 15, HEIGHT // 2 - 155)],
-        bgcolor="gray"
+    left_ear = ft.Container(
+        width=40,
+        height=40,
+        bgcolor="gray",
+        border_radius=20,
+        left=WIDTH // 2 - 30,
+        top=HEIGHT // 2 - 140,
+        transform=ft.Transform(rotation=ft.Rotation(angle=45)),
     )
 
-    right_ear = ft.Polygon(
-        points=[(WIDTH // 2 + 30, HEIGHT // 2 - 130), (WIDTH // 2 + 45, HEIGHT // 2 - 155), (WIDTH // 2 + 15, HEIGHT // 2 - 155)],
-        bgcolor="gray"
+    right_ear = ft.Container(
+        width=40,
+        height=40,
+        bgcolor="gray",
+        border_radius=20,
+        left=WIDTH // 2 - 30,
+        top=HEIGHT // 2 - 140,
+        transform=ft.Transform(rotation=ft.Rotation(angle=-45)),
     )
 
     # Хвост котика
