@@ -1,109 +1,39 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "Котик без анимации"
-    
-    # Размеры экрана
-    WIDTH = page.width
-    HEIGHT = page.height
+    page.title = "Котик через Canvas"
 
-    # Создаём "котика" из объектов
+    # Создаем холст
+    canvas = ft.Canvas(width=400, height=400)
+
     # Тело котика
-    body = ft.Container(
-        width=120,
-        height=80,
-        bgcolor="gray",
-        border_radius=20,
-        left=WIDTH // 2 - 60,
-        top=HEIGHT // 2 - 40,
-    )
+    canvas.draw_ellipse(left=150, top=250, width=100, height=60, color="gray")
 
     # Голова котика
-    head = ft.Container(
-        width=60,
-        height=60,
-        bgcolor="gray",
-        border_radius=30,
-        left=WIDTH // 2 - 30,
-        top=HEIGHT // 2 - 100,
-    )
+    canvas.draw_ellipse(left=170, top=150, width=60, height=60, color="gray")
 
     # Глаза котика
-    left_eye = ft.Container(
-        width=12,
-        height=12,
-        bgcolor="white",
-        border_radius=6,
-        left=WIDTH // 2 - 20,
-        top=HEIGHT // 2 - 110,
-    )
-
-    right_eye = ft.Container(
-        width=12,
-        height=12,
-        bgcolor="white",
-        border_radius=6,
-        left=WIDTH // 2 + 8,
-        top=HEIGHT // 2 - 110,
-    )
+    canvas.draw_ellipse(left=190, top=170, width=12, height=12, color="white")
+    canvas.draw_ellipse(left=220, top=170, width=12, height=12, color="white")
 
     # Зрачки котика
-    left_pupil = ft.Container(
-        width=6,
-        height=6,
-        bgcolor="black",
-        border_radius=3,
-        left=WIDTH // 2 - 20 + 3,
-        top=HEIGHT // 2 - 110 + 3,
-    )
-
-    right_pupil = ft.Container(
-        width=6,
-        height=6,
-        bgcolor="black",
-        border_radius=3,
-        left=WIDTH // 2 + 8 + 3,
-        top=HEIGHT // 2 - 110 + 3,
-    )
+    canvas.draw_ellipse(left=190 + 3, top=170 + 3, width=6, height=6, color="black")
+    canvas.draw_ellipse(left=220 + 3, top=170 + 3, width=6, height=6, color="black")
 
     # Уши котика
-    left_ear = ft.Container(
-        width=40,
-        height=40,
-        bgcolor="gray",
-        border_radius=20,
-        left=WIDTH // 2 - 40,
-        top=HEIGHT // 2 - 140,
-        transform=ft.Transform(rotation=ft.Rotation(angle=-45))
+    canvas.draw_polygon(
+        points=[(170, 150), (150, 110), (190, 120)],
+        color="gray"
     )
-
-    right_ear = ft.Container(
-        width=40,
-        height=40,
-        bgcolor="gray",
-        border_radius=20,
-        left=WIDTH // 2 + 10,
-        top=HEIGHT // 2 - 140,
-        transform=ft.Transform(rotation=ft.Rotation(angle=45))
+    canvas.draw_polygon(
+        points=[(230, 150), (250, 110), (210, 120)],
+        color="gray"
     )
 
     # Хвост котика
-    tail = ft.Container(
-        width=100,
-        height=10,
-        bgcolor="gray",
-        border_radius=5,
-        left=WIDTH // 2 + 60,
-        top=HEIGHT // 2 - 10,
-    )
+    canvas.draw_line(x1=250, y1=270, x2=350, y2=300, color="gray", stroke_width=8)
 
-    # Добавляем котика на страницу
-    page.add(
-        ft.Stack(
-            [body, head, left_eye, right_eye, left_pupil, right_pupil, left_ear, right_ear, tail],
-            width=WIDTH,
-            height=HEIGHT,
-        )
-    )
+    # Добавляем холст на страницу
+    page.add(canvas)
 
 ft.app(target=main)
