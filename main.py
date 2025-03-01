@@ -3,12 +3,12 @@ import flet as ft
 def main(page: ft.Page):
     page.title = "Котик"
 
-    # Размеры экрана
-    WIDTH = page.width
-    HEIGHT = page.height
-
     # Устанавливаем светлый фон
     page.bgcolor = "#f0f0f0"  # Светло-серый фон
+
+    # Размеры экрана (фиксированные, чтобы лучше управлять позициями)
+    WIDTH = 400
+    HEIGHT = 400
 
     # Тело котика
     body = ft.Container(
