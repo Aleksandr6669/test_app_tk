@@ -7,6 +7,9 @@ def main(page: ft.Page):
     WIDTH = page.width
     HEIGHT = page.height
 
+    # Устанавливаем светлый фон
+    page.bgcolor = "#f0f0f0"  # Светло-серый фон
+
     # Тело котика
     body = ft.Container(
         width=120,
