@@ -10,8 +10,8 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
     # Размеры экрана
-    WIDTH = page.window_width
-    HEIGHT = page.window_height
+    WIDTH = page.width
+    HEIGHT = page.height
 
     # Создаём "Пикачу" - желтую фигуру
     pikachu = ft.Container(
