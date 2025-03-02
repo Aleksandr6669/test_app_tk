@@ -1,74 +1,40 @@
 import flet as ft
+import time
 
 def main(page: ft.Page):
-    page.title = "Магазин PWA-приложений"
-    page.bgcolor = ft.colors.WHITE
-
-    apps = [
-        {"name": "PWA Чат", "desc": "Современный чат на PWA.", "id": "pwa_chat"},
-        {"name": "PWA Заметки", "desc": "Быстрые заметки в браузере.", "id": "pwa_notes"},
-    ]
-
-    def show_main_page():
-        page.controls.clear()
-        page.controls.append(
-            ft.Column(
-                controls=[
-                    ft.Text("Магазин PWA-приложений", size=24, weight=ft.FontWeight.BOLD),
-                    *[
-                        ft.Card(
-                            content=ft.Container(
-                                ft.Column(
-                                    [
-                                        ft.Text(app["name"], size=20, weight=ft.FontWeight.BOLD),
-                                        ft.Text(app["desc"]),
-                                        ft.ElevatedButton(
-                                            "Подробнее",
-                                            on_click=lambda e, app_id=app["id"]: open_app(app_id),
-                                        ),
-                                    ]
-                                ),
-                                padding=10,
-                            )
-                        )
-                        for app in apps
-                    ]
-                ]
+    page.title = "Push Notifications Test"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    
+    # Функция для регистрации уведомлений
+    def request_notifications(event):
+        # Проверка, поддерживает ли браузер уведомления
+        if page.context.supports_push_notifications:
+            page.context.push_notification(
+                title="Push Notification",
+                body="Это тестовое уведомление!",
+                sound="default",
+                badge="1",
+                click_action="https://example.com"
             )
+            page.add(ft.Text("Уведомление отправлено!"))
+        else:
+            page.add(ft.Text("Уведомления не поддерживаются."))
+    
+    # Кнопка для активации уведомлений
+    page.add(
+        ft.Column(
+            [
+                ft.Text("Тест push-уведомлений"),
+                ft.ElevatedButton("Отправить уведомление", on_click=request_notifications),
+            ]
         )
+    )
+
+    # Тестируем уведомления каждые 5 минут (или 300 секунд)
+    while True:
+        time.sleep(300)  # Задержка в 5 минут
+        request_notifications(None)  # Вызываем функцию отправки уведомлений
         page.update()
 
-    def open_app(app_id):
-        app = next((a for a in apps if a["id"] == app_id), None)
-        if not app:
-            return
-
-        page.controls.clear()
-        page.controls.append(
-            ft.Column(
-                controls=[
-                    ft.Text(app["name"], size=24, weight=ft.FontWeight.BOLD),
-                    ft.Text(app["desc"]),
-                    ft.ElevatedButton("Установить", on_click=lambda e: show_install_instructions(app["id"])),
-                    ft.ElevatedButton("Назад", on_click=lambda e: show_main_page()),
-                ]
-            )
-        )
-        page.update()
-
-    def show_install_instructions(app_id):
-        page.controls.clear()
-        page.controls.append(
-            ft.Column(
-                controls=[
-                    ft.Text("Инструкция по установке", size=24, weight=ft.FontWeight.BOLD),
-                    ft.Text("Здесь будет инструкция по установке PWA."),
-                    ft.ElevatedButton("Назад", on_click=lambda e: show_main_page()),
-                ]
-            )
-        )
-        page.update()
-
-    show_main_page()
-
-ft.app(target=main, view=ft.WEB_BROWSER)
+# Запуск приложения
+ft.app(target=main)
