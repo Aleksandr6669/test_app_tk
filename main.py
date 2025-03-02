@@ -71,4 +71,4 @@ def main(page: ft.Page):
     app_store = AppStore()
     page.add(app_store)
 
-ft.app(target=main, view=ft.WEB_BROWSER)
+ft.app(main)
