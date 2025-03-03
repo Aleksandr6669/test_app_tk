@@ -1,40 +1,55 @@
-import flet as ft
-import time
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QStackedWidget, QHBoxLayout
 
-def main(page: ft.Page):
-    page.title = "Push Notifications Test"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    
-    # Функция для регистрации уведомлений
-    def request_notifications(event):
-        # Проверка, поддерживает ли браузер уведомления
-        if page.context.supports_push_notifications:
-            page.context.push_notification(
-                title="Push Notification",
-                body="Это тестовое уведомление!",
-                sound="default",
-                badge="1",
-                click_action="https://example.com"
-            )
-            page.add(ft.Text("Уведомление отправлено!"))
-        else:
-            page.add(ft.Text("Уведомления не поддерживаются."))
-    
-    # Кнопка для активации уведомлений
-    page.add(
-        ft.Column(
-            [
-                ft.Text("Тест push-уведомлений"),
-                ft.ElevatedButton("Отправить уведомление", on_click=request_notifications),
-            ]
-        )
-    )
 
-    # Тестируем уведомления каждые 5 минут (или 300 секунд)
-    while True:
-        time.sleep(300)  # Задержка в 5 минут
-        request_notifications(None)  # Вызываем функцию отправки уведомлений
-        page.update()
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
 
-# Запуск приложения
-ft.app(target=main)
+        self.setWindowTitle("Простое приложение на PyQt5")
+        self.setGeometry(100, 100, 400, 600)  # Размер окна
+
+        # Основной вертикальный макет
+        layout = QVBoxLayout(self)
+        
+        # 1. Шапка
+        self.header = QLabel("Моё приложение", self)
+        self.header.setStyleSheet("background-color: #1976D2; color: white; font-size: 20px; padding: 10px;")
+        self.header.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.header)
+
+        # 2. Центральная область (контейнер для страниц)
+        self.pages = QStackedWidget(self)
+        self.page_home = QLabel("Главная страница", self)
+        self.page_search = QLabel("Поиск", self)
+        self.page_settings = QLabel("Настройки", self)
+
+        self.pages.addWidget(self.page_home)
+        self.pages.addWidget(self.page_search)
+        self.pages.addWidget(self.page_settings)
+        layout.addWidget(self.pages)
+
+        # 3. Нижняя панель навигации
+        self.navbar = QHBoxLayout()
+        self.btn_home = QPushButton("🏠 Главная")
+        self.btn_search = QPushButton("🔍 Поиск")
+        self.btn_settings = QPushButton("⚙️ Настройки")
+
+        self.btn_home.clicked.connect(lambda: self.pages.setCurrentIndex(0))
+        self.btn_search.clicked.connect(lambda: self.pages.setCurrentIndex(1))
+        self.btn_settings.clicked.connect(lambda: self.pages.setCurrentIndex(2))
+
+        self.navbar.addWidget(self.btn_home)
+        self.navbar.addWidget(self.btn_search)
+        self.navbar.addWidget(self.btn_settings)
+
+        layout.addLayout(self.navbar)
+
+        self.setLayout(layout)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
