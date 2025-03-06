@@ -1,55 +1,62 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QStackedWidget, QHBoxLayout
+import flet as ft
+import time
 
+data = [
+    {"ID": 1, "Имя": "Александр", "Возраст": 35, "Город": "Днепр"},
+    {"ID": 2, "Имя": "Евгений", "Возраст": 30, "Город": "Киев"},
+    {"ID": 3, "Имя": "Виктория", "Возраст": 28, "Город": "Одесса"},
+    {"ID": 4, "Имя": "Ольга", "Возраст": 25, "Город": "Харьков"},
+    {"ID": 5, "Имя": "Дмитрий", "Возраст": 40, "Город": "Львов"},
+    {"ID": 6, "Имя": "Анна", "Возраст": 33, "Город": "Запорожье"},
+    {"ID": 7, "Имя": "Сергей", "Возраст": 29, "Город": "Чернигов"},
+]
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+editing = False  # Флаг: редактируется ли сейчас строка
 
-        self.setWindowTitle("Простое приложение на PyQt5")
-        self.setGeometry(100, 100, 400, 600)  # Размер окна
+def main(page: ft.Page):
+    page.title = "Таблица с защитой от конфликтов"
+    page.scroll = "auto"
 
-        # Основной вертикальный макет
-        layout = QVBoxLayout(self)
-        
-        # 1. Шапка
-        self.header = QLabel("Моё приложение", self)
-        self.header.setStyleSheet("background-color: #1976D2; color: white; font-size: 20px; padding: 10px;")
-        self.header.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.header)
+    data_table = ft.DataTable(columns=[], rows=[])
 
-        # 2. Центральная область (контейнер для страниц)
-        self.pages = QStackedWidget(self)
-        self.page_home = QLabel("Главная страница", self)
-        self.page_search = QLabel("Поиск", self)
-        self.page_settings = QLabel("Настройки", self)
+    def load_data():
+        """Обновляет таблицу, если в данный момент никто не редактирует"""
+        if editing:  # Если идёт редактирование, пропускаем обновление
+            return
 
-        self.pages.addWidget(self.page_home)
-        self.pages.addWidget(self.page_search)
-        self.pages.addWidget(self.page_settings)
-        layout.addWidget(self.pages)
+        if not data:
+            return
 
-        # 3. Нижняя панель навигации
-        self.navbar = QHBoxLayout()
-        self.btn_home = QPushButton("🏠 Главная")
-        self.btn_search = QPushButton("🔍 Поиск")
-        self.btn_settings = QPushButton("⚙️ Настройки")
+        headers = list(data[0].keys())
+        data_table.columns = [ft.DataColumn(ft.Text(col)) for col in headers]
 
-        self.btn_home.clicked.connect(lambda: self.pages.setCurrentIndex(0))
-        self.btn_search.clicked.connect(lambda: self.pages.setCurrentIndex(1))
-        self.btn_settings.clicked.connect(lambda: self.pages.setCurrentIndex(2))
+        def create_row(row_data):
+            return ft.DataRow([
+                ft.DataCell(ft.TextField(
+                    value=str(row_data[col]),
+                    on_focus=lambda e: set_editing(True),  # Включаем режим редактирования
+                    on_blur=lambda e: set_editing(False)   # Выключаем после редактирования
+                ))
+                for col in headers
+            ])
 
-        self.navbar.addWidget(self.btn_home)
-        self.navbar.addWidget(self.btn_search)
-        self.navbar.addWidget(self.btn_settings)
+        data_table.rows = [create_row(row) for row in data]
+        page.update()
 
-        layout.addLayout(self.navbar)
+    def set_editing(state):
+        """Меняет состояние редактирования"""
+        global editing
+        editing = state
 
-        self.setLayout(layout)
+    def update_loop():
+        """Фоновый процесс для обновления таблицы"""
+        while True:
+            time.sleep(5)  # Обновляем каждые 5 секунд
+            load_data()
 
+    # Инициализация
+    load_data()
+    page.add(data_table)
+    page.run_task(update_loop)  # Фоновой задачей обновляем таблицу
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+ft.app(target=main)
