@@ -1,33 +1,51 @@
 import flet as ft
+import requests
+
+API_URL = "https://im.comfy.ua/api/remains/warehouses?sku=3299741&cityId=506&storeId=5&allShops=true"
+
+def fetch_data():
+    try:
+        response = requests.get(API_URL)
+        data = response.json().get("items", [])
+        return data
+    except Exception as e:
+        print("Ошибка запроса:", e)
+        return []
 
 def main(page: ft.Page):
-    page.title = "Шары на чёрном фоне"
-    page.bgcolor = ft.colors.BLACK  # Устанавливаем чёрный фон
+    page.title = "Остатки товаров"
+    
+    # Заголовки таблицы
+    columns = [
+        ft.DataColumn(ft.Text("ID Склада")),
+        ft.DataColumn(ft.Text("Город")),
+        ft.DataColumn(ft.Text("Адрес")),
+        ft.DataColumn(ft.Text("Телефон")),
+        ft.DataColumn(ft.Text("Остаток")),
+        ft.DataColumn(ft.Text("Доступно с")),
+    ]
+    
+    # Таблица с данными
+    table = ft.DataTable(columns=columns, rows=[])
 
-    # Создаём квадратики
-    left_square = ft.Container(width=200, height=500, bgcolor=ft.colors.BLUE, left=0, top=0)
-    right_square = ft.Container(width=200, height=500, bgcolor=ft.colors.RED, left=200, top=0)
+    def update_table(e):
+        table.rows.clear()
+        data = fetch_data()
 
-    # Создаём шары
-    left_ball = ft.Container(width=50, height=50, bgcolor=ft.colors.YELLOW, left=100, top=250, border_radius=25, id="left_ball")
-    right_ball = ft.Container(width=50, height=50, bgcolor=ft.colors.GREEN, left=400, top=250, border_radius=25, id="right_ball")
-
-    # Функция для обновления положения шаров на основе данных акселерометра
-    def update_positions(accelerometer_data):
-        ax, ay, az = accelerometer_data  # Получаем данные акселерометра
-
-        # Обновляем позиции шаров в квадратиках
-        left_ball.top = 250 + (ay * 100)  # Двигаем шар вверх/вниз
-        left_ball.left = 100 + (ax * 100)  # Двигаем шар влево/вправ
-        right_ball.top = 250 + (ay * 100)
-        right_ball.left = 400 + (ax * 100)
-
+        for item in data:
+            table.rows.append(ft.DataRow(cells=[
+                ft.DataCell(ft.Text(item.get("warehouseId", ""))),
+                ft.DataCell(ft.Text(item.get("warehouseCity", ""))),
+                ft.DataCell(ft.Text(item.get("address", ""))),
+                ft.DataCell(ft.Text(item.get("phone", ""))),
+                ft.DataCell(ft.Text(str(item.get("remains", 0)))),
+                ft.DataCell(ft.Text(item.get("availableOnDate", ""))),
+            ]))
         page.update()
 
-    # Подключаем акселерометр
-    page.on_accelerometer = update_positions
+    # Кнопка обновления
+    btn_update = ft.ElevatedButton("Обновить данные", on_click=update_table)
 
-    # Интерфейс
-    page.add(left_square, right_square, left_ball, right_ball)
+    page.add(btn_update, table)
 
 ft.app(target=main)
