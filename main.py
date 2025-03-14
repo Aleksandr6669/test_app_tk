@@ -8,9 +8,17 @@ def fetch_city_id(city_name):
     try:
         response = requests.get(API_URL_CITIES.format(city_name=city_name))
         data = response.json()
+        
+        # Выводим в консоль полный ответ от API
+        print("Ответ API (города):", data)
+
         if data and "items" in data:
-            # Возвращаем список с городами
-            return [{"id": city["id"], "name": city["name"]} for city in data["items"]]
+            cities = [{"id": city["id"], "name": city["name"]} for city in data["items"]]
+            
+            # Логируем найденные города
+            print("Найденные города:", cities)
+            return cities
+
         return []
     except Exception as e:
         print(f"Ошибка запроса города: {e}")
@@ -19,7 +27,7 @@ def fetch_city_id(city_name):
 def main(page: ft.Page):
     page.title = "Поиск города и ID"
     
-    # Поля для ввода города
+    # Поле для ввода города
     city_search = ft.TextField(label="Введите город", autofocus=True)
     
     # Список для отображения предложений
@@ -35,13 +43,18 @@ def main(page: ft.Page):
     def update_city_suggestions(e):
         city_name = city_search.value.strip()
         if city_name:
-            cities = fetch_city_id(city_name)
+            cities = fetch_city_id(city_name)  # Получаем список городов
             city_suggestions.controls.clear()
+            
             if cities:
-                city_suggestions.controls.extend([ft.ListTile(
-                    title=ft.Text(f"{city['name']} (ID: {city['id']})"),
-                    on_click=lambda e, city=city: select_city(city)
-                ) for city in cities])
+                for city in cities:
+                    print(f"Добавляю в список: {city['name']} (ID: {city['id']})")  # Логируем добавление
+                    city_suggestions.controls.append(
+                        ft.ListTile(
+                            title=ft.Text(f"{city['name']} (ID: {city['id']})"),
+                            on_click=lambda e, city=city: select_city(city)
+                        )
+                    )
             page.update()
 
     # Функция для выбора города
@@ -49,6 +62,10 @@ def main(page: ft.Page):
         nonlocal selected_city_id, selected_city_name
         selected_city_id = city["id"]
         selected_city_name = city["name"]
+        
+        # Логируем выбор города
+        print(f"Выбран город: {selected_city_name} (ID: {selected_city_id})")
+        
         selected_city_display.value = f"Город: {selected_city_name} (ID: {selected_city_id})"
         city_search.value = ""
         city_suggestions.controls.clear()
