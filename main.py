@@ -23,7 +23,7 @@ def main(page: ft.Page):
     city_search = ft.TextField(label="Введите город", autofocus=True)
     
     # Список для отображения предложений
-    city_dropdown = ft.Dropdown()
+    city_suggestions = ft.ListView()
 
     selected_city_id = None
     selected_city_name = None
@@ -31,16 +31,17 @@ def main(page: ft.Page):
     # Отображение выбранного города и его ID
     selected_city_display = ft.Text("Город не выбран (ID: -)")
 
-    # Функция для обновления выпадающего списка городов
+    # Функция для обновления списка городов
     def update_city_suggestions(e):
         city_name = city_search.value.strip()
         if city_name:
             cities = fetch_city_id(city_name)
-            city_dropdown.options.clear()
+            city_suggestions.controls.clear()
             if cities:
-                city_dropdown.options.extend([ft.dropdown.Option(f"{city['name']} (ID: {city['id']})", 
-                                                                on_click=lambda e, city=city: select_city(city)) 
-                                              for city in cities])
+                city_suggestions.controls.extend([ft.ListTile(
+                    title=ft.Text(f"{city['name']} (ID: {city['id']})"),
+                    on_click=lambda e, city=city: select_city(city)
+                ) for city in cities])
             page.update()
 
     # Функция для выбора города
@@ -50,11 +51,11 @@ def main(page: ft.Page):
         selected_city_name = city["name"]
         selected_city_display.value = f"Город: {selected_city_name} (ID: {selected_city_id})"
         city_search.value = ""
-        city_dropdown.options.clear()
+        city_suggestions.controls.clear()
         page.update()
 
     # Добавляем элементы на страницу
-    page.add(city_search, city_dropdown, selected_city_display)
+    page.add(city_search, city_suggestions, selected_city_display)
 
     # Обработчик изменения текста для обновления списка городов
     city_search.on_change = update_city_suggestions
