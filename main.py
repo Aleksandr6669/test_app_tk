@@ -17,12 +17,9 @@ def main(page: ft.Page):
     
     # Заголовки таблицы
     columns = [
-        ft.DataColumn(ft.Text("ID Склада")),
-        ft.DataColumn(ft.Text("Город")),
-        ft.DataColumn(ft.Text("Адрес")),
-        ft.DataColumn(ft.Text("Телефон")),
+        ft.DataColumn(ft.Text("SKU")),
         ft.DataColumn(ft.Text("Остаток")),
-        ft.DataColumn(ft.Text("Доступно с")),
+        ft.DataColumn(ft.Text("Магазин")),
     ]
     
     # Таблица с данными
@@ -33,13 +30,11 @@ def main(page: ft.Page):
         data = fetch_data()
 
         for item in data:
+            # Добавляем только необходимые данные: SKU, остаток и магазин
             table.rows.append(ft.DataRow(cells=[
-                ft.DataCell(ft.Text(item.get("warehouseId", ""))),
-                ft.DataCell(ft.Text(item.get("warehouseCity", ""))),
-                ft.DataCell(ft.Text(item.get("address", ""))),
-                ft.DataCell(ft.Text(item.get("phone", ""))),
-                ft.DataCell(ft.Text(str(item.get("remains", 0)))),
-                ft.DataCell(ft.Text(item.get("availableOnDate", ""))),
+                ft.DataCell(ft.Text(item.get("sku", ""))),  # SKU
+                ft.DataCell(ft.Text(str(item.get("remains", 0)))),  # Остаток
+                ft.DataCell(ft.Text(item.get("storeName", ""))),  # Магазин
             ]))
         page.update()
 
