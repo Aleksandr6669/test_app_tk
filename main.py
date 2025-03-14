@@ -2,44 +2,44 @@ import flet as ft
 import requests
 import json
 
-# Базовый URL для поиска городов
+# URL для поиска городов
 API_URL_CITIES = "https://im.comfy.ua/api/cities/all?q={city_name}&limit=200&lang=5"
 
-def fetch_city_id(city_name):
+def fetch_cities(city_name):
+    """Запрашивает список городов по введенному названию."""
     try:
         response = requests.get(API_URL_CITIES.format(city_name=city_name))
         data = response.json()
-        return data  # Теперь возвращаем весь JSON
+        return data.get("items", [])  # Возвращаем только список городов
     except Exception as e:
         return {"error": str(e)}
 
 def main(page: ft.Page):
-    page.title = "Поиск города и ID"
+    page.title = "Выбор города и ID магазина"
 
-    # Поле для ввода города
+    # Поле ввода города
     city_search = ft.TextField(label="Введите город", autofocus=True)
 
-    # Список для отображения предложений
+    # Список с результатами поиска
     city_suggestions = ft.Column(scroll=ft.ScrollMode.AUTO)
 
     # Отображение выбранного города и его ID
     selected_city_display = ft.Text("Город не выбран (ID: -)")
 
-    # Поле для вывода JSON-ответа
+    # Поле для вывода полного JSON-ответа API
     api_response_text = ft.Text(value="Здесь будет JSON-ответ API", selectable=True)
 
-    # Функция для обновления списка городов при каждом изменении текста
     def update_city_suggestions(e):
+        """Обновляет список городов при каждом изменении текста."""
         city_name = city_search.value.strip()
         if city_name:
-            data = fetch_city_id(city_name)  # Получаем полный JSON-ответ
+            cities = fetch_cities(city_name)  # Получаем список городов
             city_suggestions.controls.clear()
 
-            # Выводим полный JSON на экран
-            api_response_text.value = f"JSON-ответ API:\n{json.dumps(data, indent=2, ensure_ascii=False)}"
+            # Выводим полный JSON-ответ API на экран
+            api_response_text.value = f"JSON-ответ API:\n{json.dumps(cities, indent=2, ensure_ascii=False)}"
 
-            if isinstance(data, dict) and "items" in data and data["items"]:
-                cities = [{"id": city["id"], "name": city["name"]} for city in data["items"]]
+            if cities:
                 for city in cities:
                     city_suggestions.controls.append(
                         ft.TextButton(
@@ -56,14 +56,14 @@ def main(page: ft.Page):
 
         page.update()
 
-    # Функция для выбора города
     def select_city(city):
-        selected_city_display.value = f"Город: {city['name']} (ID: {city['id']})"
+        """Обрабатывает выбор города и вставляет его ID."""
+        selected_city_display.value = f"Выбран город: {city['name']} (ID магазина: {city['id']})"
         city_search.value = ""  # Очистка поля ввода
         city_suggestions.controls.clear()
         page.update()
 
-    # Добавляем обработчик изменений поля ввода
+    # Привязываем обновление списка городов к изменению текста в поле
     city_search.on_change = update_city_suggestions
 
     # Добавляем элементы на страницу
