@@ -13,12 +13,12 @@ def fetch_city_id(city_name):
         response = requests.get(API_URL_CITIES.format(city_name=city_name))
         data = response.json()
         if data and "items" in data:
-            # Возвращаем первый найденный город
-            return data["items"][0]["id"]  # Получаем id города
-        return None
+            # Возвращаем список с городами
+            return [{"id": city["id"], "name": city["name"]} for city in data["items"]]
+        return []
     except Exception as e:
         print(f"Ошибка запроса города: {e}")
-        return None
+        return []
 
 def fetch_product_suggestions(query, city_id):
     try:
@@ -57,6 +57,7 @@ def main(page: ft.Page):
     product_suggestions = ft.ListView()
 
     selected_city_id = None
+    selected_city_name = None
     selected_skus = []
 
     # Заголовки таблицы
@@ -69,21 +70,30 @@ def main(page: ft.Page):
     # Таблица с данными
     table = ft.DataTable(columns=columns, rows=[])
 
+    # Выбранный город и товары для отображения
+    selected_city_display = ft.Text("Город не выбран")
+    selected_products_display = ft.Text("Товары не выбраны")
+
     # Функция для обновления города
     def update_city_suggestions(e):
         city_name = city_search.value.strip()
         if city_name:
-            city_id = fetch_city_id(city_name)
-            if city_id:
-                city_suggestions.controls.clear()
-                city_suggestions.controls.append(ft.ListTile(title=ft.Text(f"Город: {city_name} (ID: {city_id})")))
+            cities = fetch_city_id(city_name)
+            city_suggestions.controls.clear()
+            if cities:
+                city_suggestions.controls.extend([ft.ListTile(
+                    title=ft.Text(f"{city['name']} (ID: {city['id']})"),
+                    on_click=lambda e, city=city: select_city(city)
+                ) for city in cities])
             page.update()
 
     # Функция для выбора города
-    def select_city(e):
-        nonlocal selected_city_id
-        selected_city_id = e.control.text.split(" (ID: ")[1][:-1]  # Извлекаем city_id из текста
-        city_search.value = selected_city_id
+    def select_city(city):
+        nonlocal selected_city_id, selected_city_name
+        selected_city_id = city["id"]
+        selected_city_name = city["name"]
+        selected_city_display.value = f"Город: {selected_city_name} (ID: {selected_city_id})"
+        city_search.value = ""
         city_suggestions.controls.clear()
         page.update()
 
@@ -94,12 +104,16 @@ def main(page: ft.Page):
             products = fetch_product_suggestions(product_name, selected_city_id)
             product_suggestions.controls.clear()
             if products:
-                product_suggestions.controls.extend([ft.ListTile(title=ft.Text(f"{product['name']} (SKU: {product['sku']})")) for product in products])
+                product_suggestions.controls.extend([ft.ListTile(
+                    title=ft.Text(f"{product['name']} (SKU: {product['sku']})"),
+                    on_click=lambda e, product=product: select_product(product)
+                ) for product in products])
             page.update()
 
     # Функция для выбора товара
-    def select_product(e):
-        selected_skus.append(e.control.text.split(" (SKU: ")[1][:-1])  # Извлекаем SKU из текста
+    def select_product(product):
+        selected_skus.append(product["sku"])
+        selected_products_display.value = f"Выбрано товаров: {len(selected_skus)}"
         product_search.value = ""
         product_suggestions.controls.clear()
         page.update()
@@ -107,11 +121,10 @@ def main(page: ft.Page):
     # Функция для загрузки данных
     def load_data(e):
         if selected_city_id and selected_skus:
-            city_id = fetch_city_id(selected_city_id)
             table.rows.clear()
 
             for sku in selected_skus:
-                data = fetch_data(sku, city_id)
+                data = fetch_data(sku, selected_city_id)
                 for item in data:
                     if item.get("remains", 0) > 0:  # Только товары, которые есть в наличии
                         table.rows.append(ft.DataRow(cells=[
@@ -125,12 +138,11 @@ def main(page: ft.Page):
     btn_load_data = ft.ElevatedButton("Загрузить данные", on_click=load_data)
 
     # Добавляем элементы на страницу
-    page.add(city_search, city_suggestions, product_search, product_suggestions, btn_load_data, table)
+    page.add(city_search, city_suggestions, selected_city_display, product_search, product_suggestions, 
+             selected_products_display, btn_load_data, table)
 
     # Обработчики событий для обновления списка города и товаров
     city_search.on_change = update_city_suggestions
     product_search.on_change = update_product_suggestions
-    city_suggestions.on_click = select_city
-    product_suggestions.on_click = select_product
 
 ft.app(target=main)
