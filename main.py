@@ -35,7 +35,7 @@ def main(page: ft.Page):
                 for city in cities:
                     city_suggestions.controls.append(
                         ft.TextButton(
-                            text=f"{city['name']} (ID: {city['externalCityId']})",
+                            text=f"{city['name']} (ID: {city['id']})",
                             on_click=lambda e, city=city: select_city(city),
                         )
                     )
@@ -46,7 +46,7 @@ def main(page: ft.Page):
 
     def select_city(city):
         """Обрабатывает выбор города."""
-        selected_city_id.value = f"ID: {city['externalCityId']}"
+        selected_city_id.value = f"ID: {city['id']}"
         city_search.value = city["name"]  # Подставляем название города в поле ввода
         city_suggestions.controls.clear()  # Очищаем список после выбора
         page.update()
