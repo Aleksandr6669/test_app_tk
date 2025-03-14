@@ -1,6 +1,5 @@
 import flet as ft
 import requests
-import json
 
 # URL для поиска городов
 API_URL_CITIES = "https://im.comfy.ua/api/cities/all?q={city_name}&limit=200&lang=5"
@@ -9,70 +8,56 @@ def fetch_cities(city_name):
     """Запрашивает список городов по введенному названию."""
     try:
         response = requests.get(API_URL_CITIES.format(city_name=city_name))
-        data = response.json()
-        return data.get("items", [])  # Возвращаем только список городов
-    except Exception as e:
-        return {"error": str(e)}
+        return response.json()  # Получаем список городов (массив JSON-объектов)
+    except Exception:
+        return []  # Если ошибка, возвращаем пустой список
 
 def main(page: ft.Page):
-    page.title = "Выбор города и ID магазина"
+    page.title = "Поиск города"
 
     # Поле ввода города
-    city_search = ft.TextField(label="Введите город", autofocus=True)
+    city_search = ft.TextField(label="Введите город", autofocus=True, expand=True)
 
-    # Список с результатами поиска
-    city_suggestions = ft.Column(scroll=ft.ScrollMode.AUTO)
+    # Поле для вывода ID города (только для отображения)
+    selected_city_id = ft.Text(value="ID: -", size=16, weight=ft.FontWeight.BOLD)
 
-    # Отображение выбранного города и его ID
-    selected_city_display = ft.Text("Город не выбран (ID: -)")
-
-    # Поле для вывода полного JSON-ответа API
-    api_response_text = ft.Text(value="Здесь будет JSON-ответ API", selectable=True)
+    # Список найденных городов
+    city_suggestions = ft.Column()
 
     def update_city_suggestions(e):
-        """Обновляет список городов при каждом изменении текста."""
+        """Обновляет список городов при изменении текста."""
         city_name = city_search.value.strip()
+        city_suggestions.controls.clear()
+
         if city_name:
-            cities = fetch_cities(city_name)  # Получаем список городов
-            city_suggestions.controls.clear()
-
-            # Выводим полный JSON-ответ API на экран
-            api_response_text.value = f"JSON-ответ API:\n{json.dumps(cities, indent=2, ensure_ascii=False)}"
-
+            cities = fetch_cities(city_name)  # Получаем города
             if cities:
                 for city in cities:
                     city_suggestions.controls.append(
                         ft.TextButton(
-                            text=f"{city['name']} (ID: {city['id']})",
+                            text=f"{city['name']} (ID: {city['externalCityId']})",
                             on_click=lambda e, city=city: select_city(city),
                         )
                     )
             else:
-                api_response_text.value += "\n\nГорода не найдены."
-
-        else:
-            city_suggestions.controls.clear()
-            api_response_text.value = "Введите название города."
+                city_suggestions.controls.append(ft.Text("Города не найдены", italic=True))
 
         page.update()
 
     def select_city(city):
-        """Обрабатывает выбор города и вставляет его ID."""
-        selected_city_display.value = f"Выбран город: {city['name']} (ID магазина: {city['id']})"
-        city_search.value = ""  # Очистка поля ввода
-        city_suggestions.controls.clear()
+        """Обрабатывает выбор города."""
+        selected_city_id.value = f"ID: {city['externalCityId']}"
+        city_search.value = city["name"]  # Подставляем название города в поле ввода
+        city_suggestions.controls.clear()  # Очищаем список после выбора
         page.update()
 
-    # Привязываем обновление списка городов к изменению текста в поле
+    # Обновление списка при изменении текста
     city_search.on_change = update_city_suggestions
 
-    # Добавляем элементы на страницу
+    # Структура страницы
     page.add(
-        city_search,
-        city_suggestions,
-        selected_city_display,
-        ft.Text("Ответ API:", size=16, weight=ft.FontWeight.BOLD),
-        api_response_text
+        ft.Row([city_search, selected_city_id]),  # Поле ввода + ID города
+        city_suggestions,  # Список городов
     )
 
 ft.app(target=main)
