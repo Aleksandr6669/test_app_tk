@@ -69,6 +69,7 @@ def main(page: ft.Page):
         if city_name:
             cities = fetch_cities(city_name)[:5]
             if cities:
+                city_suggestions_container.controls.clear()
                 for city in cities:
                     city_suggestions_container.controls.append(
                         ft.TextButton(
