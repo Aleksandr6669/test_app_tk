@@ -192,10 +192,10 @@ def main(page: ft.Page):
             page.update()
             return
         # Показати індикатор завантаження
-        report_section.controls = [ft.Text("Завантаження даних...", color="white"), ft.ProgressBar()]
+        report_section.controls = [ft.Text("Завантаження даних...", color="blue"), ft.ProgressBar()]
         page.update()
 
-        time.sleep(5)
+        time.sleep(7)
 
         report_section.controls.clear()
         grouped_products = {}
@@ -206,7 +206,7 @@ def main(page: ft.Page):
                 product_name = product_data.value
                 product_sku = product_data.data
                 raw_data = fetch_report(product_sku, selected_city_id)
-                time.sleep(1)
+                time.sleep(2)
 
                 for item in raw_data.get("items", []):
                     shop_name = item.get("shop_name", "")
