@@ -234,6 +234,7 @@ def main(page: ft.Page):
         page.update()
 
     load_saved_products()
+    add_button.disabled = True
     city_search.on_change = update_city_suggestions
 
     scrollable_content = ft.Row(
