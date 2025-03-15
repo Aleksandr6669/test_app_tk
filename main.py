@@ -147,7 +147,6 @@ def main(page: ft.Page):
         # Delete a product input field
         def delete_product_field(e):
             products_section.controls.remove(product_container)
-            save_current_products()
             add_button.disabled = False
             page.update()
 
@@ -165,11 +164,10 @@ def main(page: ft.Page):
             product_search.data = product_sku
 
         products_section.controls.insert(0, product_container)
-        save_current_products()
         page.update()
 
     # Save current products to file
-    def save_current_products():
+    def save_current_products(e):
         data = []
         for product_section in products_section.controls:
             product_data = product_section.controls[0].controls[0]
@@ -187,7 +185,7 @@ def main(page: ft.Page):
 
     # Fetch and display product report
     def fetch_and_display_report(e):
-        save_current_products()
+        
         if not selected_city_id:
             report_section.controls = [ft.Text("Будь ласка, оберіть місто перед запитом звіту.", color="red")]
             page.update()
@@ -252,7 +250,11 @@ def main(page: ft.Page):
                     city_suggestions_container,
                     ft.Row([ft.Text("Товари", size=18, color="white"), add_button]),
                     products_section,
-                    ft.ElevatedButton(text="Запитати залишки", on_click=fetch_and_display_report, color="white"),
+                    ft.Row([
+                        ft.ElevatedButton(text="Зберегти зміни", on_click=save_current_products, color="green"),
+                        ft.ElevatedButton(text="Запитати залишки", on_click=fetch_and_display_report, color="white"),
+                        ]),
+
                 ],
                 expand=1,
                 alignment=ft.MainAxisAlignment.START,
