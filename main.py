@@ -2,6 +2,7 @@ import flet as ft
 import requests
 import json
 import os
+import time
 
 # URL для API
 API_URL_CITIES = "https://im.comfy.ua/api/cities/all?q={city_name}&limit=200&lang=5"
@@ -190,6 +191,11 @@ def main(page: ft.Page):
             report_section.controls = [ft.Text("Будь ласка, оберіть місто перед запитом звіту.", color="red")]
             page.update()
             return
+        # Показати індикатор завантаження
+        report_section.controls = [ft.Text("Завантаження даних...", color="white"), ft.ProgressBar()]
+        page.update()
+
+        time.sleep(5)
 
         report_section.controls.clear()
         grouped_products = {}
@@ -200,6 +206,7 @@ def main(page: ft.Page):
                 product_name = product_data.value
                 product_sku = product_data.data
                 raw_data = fetch_report(product_sku, selected_city_id)
+                time.sleep(1)
 
                 for item in raw_data.get("items", []):
                     shop_name = item.get("shop_name", "")
