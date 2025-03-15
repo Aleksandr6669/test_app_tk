@@ -237,7 +237,6 @@ def main(page: ft.Page):
 
     # Toggle visibility of product list
     def toggle_visibility(product_list):
-        save_current_products()
         product_list.visible = not product_list.visible
         page.update()
 
