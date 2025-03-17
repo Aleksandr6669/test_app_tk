@@ -49,7 +49,7 @@ def load_data():
 def main(page: ft.Page):
 
     page.title = "Залишки"
-    page.version = "0.7"
+    page.version = "0.9"
     page.description = "Залишки"
 
     page.assets_dir = "assets"
