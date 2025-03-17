@@ -10,7 +10,7 @@ API_URL_PRODUCTS = "https://im.comfy.ua/api/searcher/autosuggest?q={query}&limit
 API_URL_REPORT = "https://im.comfy.ua/api/remains/warehouses?sku={sku}&cityId={city_id}&storeId=5&allShops=true"
 
 # Шлях до файлу для збереження товарів
-DATA_FILE = "saved_products.json"
+DATA_FILE = "src/assets/saved_products.json"
 
 def fetch_cities(city_name):
     try:
@@ -47,7 +47,14 @@ def load_data():
     return []
 
 def main(page: ft.Page):
+
     page.title = "Залишки"
+    page.version = "0.7"
+    page.description = "Залишки"
+
+    page.assets_dir = "assets"
+    page.manifest = "manifest.json" 
+    
     page.bgcolor = "black"
     page.theme_mode = "dark"
 
@@ -216,19 +223,23 @@ def main(page: ft.Page):
                     if shop_key not in grouped_products:
                         grouped_products[shop_key] = []
 
-                    grouped_products[shop_key].append(f"{product_name}: Залишки {remains}")
+                    grouped_products[shop_key].append(f" - {product_name}: Залишки {remains}")
             else:
                 report_section.controls.append(ft.Text("Некоректний SKU товару.", color="red"))
 
         for shop_key, products in grouped_products.items():
             product_list = ft.Column(
-                [ft.Text(product, size=14, color="white") for product in products],
-                visible=False
+                [ft.Text(product, size=12, color=(
+                    "green" if int(product[-1]) > 5 else
+                    "red" if int(product[-1]) == 0 else
+                    "white"
+                ),) for product in products],
+                visible=True
             )
             toggle_button = ft.TextButton(
                 text=shop_key,
                 on_click=lambda e, product_list=product_list: toggle_visibility(product_list),
-                style=ft.ButtonStyle(color="white", bgcolor="grey")
+                style=ft.ButtonStyle(padding=12, color="white", bgcolor="blue")
             )
             report_section.controls.append(ft.Column([toggle_button, product_list]))
         page.update()
@@ -273,4 +284,4 @@ def main(page: ft.Page):
     page.add(scrollable_content)
     add_button.on_click = add_product_field
 
-ft.app(target=main)
+ft.app(target=main, assets_dir="assets")
